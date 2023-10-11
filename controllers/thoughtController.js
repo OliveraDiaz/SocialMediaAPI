@@ -3,13 +3,17 @@ const { user, thought } = require('../models');
 const thoughtController = {
     async getAllThoughts(req, res) {
         try {
-            const dbThoughtData = await thought.find({}).populate('reactions');
+            const dbThoughtData = await thought.findById(req.params.id);
+            if (!dbThoughtData) {
+                return res.status(404).json({ message: 'No thought found with this id!' });
+            }
             res.json(dbThoughtData);
         } catch (err) {
             console.log(err);
-            res.status(500).json({ message: 'internal server error' });
+            res.status(500).json({ message: 'Internal server error' });
         }
     },
+    
 
     //handler for the "createThought" API endpoint
 

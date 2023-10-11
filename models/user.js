@@ -1,10 +1,12 @@
 const { Schema, model } = require('mongoose');
 
 const userSchema = new Schema({
-    username: String,
+    username: {
+    type: String,
     required: true,
     unique: true,
     trim: true,
+    },
 },
 {
     toJSON: {
