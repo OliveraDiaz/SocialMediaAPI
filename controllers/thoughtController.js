@@ -1,13 +1,14 @@
-const { user, thought } = require('../models');
+const { thought } = require('../models/thoughts');
+const {types} = require('mongoose');
 
 const thoughtController = {
     async getAllThoughts(req, res) {
         try {
-            const dbThoughtData = await thought.findById(req.params.id);
-            if (!dbThoughtData) {
+            const thoughts = await thought.findById(req.params.id);
+            if (!thoughts)  {
                 return res.status(404).json({ message: 'No thought found with this id!' });
             }
-            res.json(dbThoughtData);
+            res.json(thoughts);
         } catch (err) {
             console.log(err);
             res.status(500).json({ message: 'Internal server error' });
@@ -19,10 +20,10 @@ const thoughtController = {
 
     async createThought(req, res) {
         try {
-            const dbThoughtData = await thought.create(req.body);
+            const thought = await thought.create(req.body);
             const dbUserData = await user.findOneAndUpdate(
                 { _id: req.body.userId },
-                { $push: { thoughts: dbThoughtData._id } },
+                { $push: { thoughts: thought._id } },
                 { new: true }
                 );
                 if (!dbUserData) {
@@ -39,10 +40,10 @@ const thoughtController = {
 
     async deleteThought(req, res) {
         try{
-            const dbThoughtData = await thought.findOneAndDelete({ _id: req.params.id });
+            const thought = await thought.findOneAndDelete({ _id: req.params.id });
             const dbUserData = await user.findOneAndUpdate(
-                { username: dbThoughtData.username },
-                { $pull: { thoughts: dbThoughtData._id } },
+                { username: thought.username },
+                { $pull: { thoughts: thought._id } },
                 { new: true }
             );
             if (!dbUserData) {
@@ -58,15 +59,15 @@ const thoughtController = {
          // Handler for the "update thought by ID" API endpoint
     async updateThought(req, res) {
         try {
-                const dbThoughtData = await thought.findOneAndUpdate(
+                const thought= await thought.findOneAndUpdate(
                     { _id: req.params.id },
                     { $set: req.body },
                     { new: true }
                 );
-                if (!dbThoughtData) {
+                if (!thought) {
                     return res.status(404).json({ message: 'No thought found with this id!' });
                 }
-                res.json(dbThoughtData);
+                res.json(thought);
             } catch (err) {
                 console.log(err);
                 res.status(500).json({ message: 'Internal server error' });
@@ -78,15 +79,15 @@ const thoughtController = {
   // Handler for the "create reaction" API endpoint
   async addReaction(req, res) {
     try {
-        const dbThoughtData = await thought.findOneAndUpdate(
+        const thought = await thought.findOneAndUpdate(
             { _id: req.params.thoughtId },
             { $push: { reactions: req.body } },
             { new: true }
         );
-        if (!dbThoughtData) {
+        if (!thought) {
             return res.status(404).json({ message: 'No thought found with this id!' });
         }
-        res.json(dbThoughtData);
+        res.json(thought);
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Internal server error' });
@@ -98,15 +99,15 @@ const thoughtController = {
 
     async deleteReaction(req, res) {
         try {   
-            const dbThoughtData = await thought.findOneAndUpdate(
+            const thought = await thought.findOneAndUpdate(
                 { _id: req.params.thoughtId },
                 { $pull: { reactions: { reactionId: req.params.reactionId } } },
                 { new: true }
             );
-            if (!dbThoughtData) {
+            if (!thought) {
                 return res.status(404).json({ message: 'No thought found with this id!' });
             }
-            res.json(dbThoughtData);
+            res.json(thought);
         } catch (err) {
             console.log(err);
             res.status(500).json({ message: 'Internal server error' });
