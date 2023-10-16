@@ -1,17 +1,6 @@
-const { user } = require('../models');
+const { user, thought } = require('../models');
 
-const userController = {
-//get all users
-getAllUsers(req, res) {
-    user.find({})
-        .then(dbUserData => res.json(dbUserData))
-        .catch(err => {
-            console.log(err);
-            res.status(500).json(err);
-        });
-},
-
-
+module.exports = {
 
 async getAllUsers(req, res) {
     try {
@@ -118,5 +107,3 @@ async removeFriend(req, res) {
     }
 }
 };
-
-module.exports = userController;
