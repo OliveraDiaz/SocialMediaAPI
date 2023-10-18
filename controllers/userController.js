@@ -45,7 +45,9 @@ async createUser(req, res) {
 
 async updateUser(req, res) {
     try {
-        const dbUserData = await user.findOneAndUpdate({ _id: req.params.id }, { $set: req.body }, { new: true });
+        const dbUserData = await user.findOneAndUpdate(
+            { _id: req.params.userId },
+            { $set: req.body }, { new: true });
         if (!dbUserData) {
             return res.status(404).json({ message: 'No user found with this id!' });
         }

@@ -29,29 +29,21 @@ const thoughtController = {
     },
     
 
-    //handler for the "createThought" API endpoint
-
+//create new thought
     async createThought(req, res) {
         try {
-            const dbThoughtData = await thought.create({ thoughtText: req.body.thoughtText, username: req.body.username });
-            const dbUserData = await user.findOneAndUpdate(
-                { _id: req.body.userId },
-                { $push: { thoughts: dbThoughtData._id } },
-                { new: true }
-                );
-                if (!dbUserData) {
-                     return res.status(404).json({ message: 'No user found with this id!' });
-                    }
-        res.json(dbUserData);
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-},
+            const dbThoughtData = await thought.create(req.body);
+            res.json(dbThoughtData);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
 
 async deleteThoughtById(req, res) {
     try {
-        const thoughtData = await thought.findByIdAndDelete(req.params.id);
+        const thoughtData = await thought.findByIdAndDelete(req.params.thoughtId);
         if (!thoughtData) {
             return res.status(404).json({ message: 'No thought found with this id!' });
         }
@@ -70,7 +62,7 @@ async deleteThoughtById(req, res) {
     async updateThoughtById(req, res) {
         try {
                 const dbThoughtData = await thought.findOneAndUpdate(
-                    { _id: req.params.id },
+                    { _id: req.params.thoughtId },
                     { $set: req.body },
                     { new: true }
                 );
@@ -89,14 +81,7 @@ async deleteThoughtById(req, res) {
   // Handler for the "create reaction" API endpoint
   async addReaction(req, res) {
     try {
-        const dbThoughtData = await thought.findOneAndUpdate(
-            { _id: req.params.thoughtId },
-            { $push: { reactions: req.body } },
-            { new: true }
-        );
-        if (!dbThoughtData) {
-            return res.status(404).json({ message: 'No thought found with this id!' });
-        }
+        const dbThoughtData = await thought.create(req.body);
         res.json(dbThoughtData);
     } catch (err) {
         console.log(err);
@@ -105,11 +90,12 @@ async deleteThoughtById(req, res) {
 },
 
 
+
     // Handler for the "delete reaction" API endpoint
 
     async deleteReaction(req, res) {
         try {   
-            const dbThoughtData = await thought.findOneAndUpdate(
+            const dbThoughtData = await thought.findOneAndDelete(
                 { _id: req.params.thoughtId },
                 { $pull: { reactions: { reactionId: req.params.reactionId } } },
                 { new: true }
