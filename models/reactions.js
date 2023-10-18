@@ -31,4 +31,5 @@ const reactionSchema = new Schema(
         id: false,
     }
 );
-module.exports = reactionSchema
+
+module.exports = reactionSchema;

@@ -1,30 +1,33 @@
-const { user, thought } = require('../models');
+const { user } = require('../models');
 
-module.exports = {
+const userController = {
 
-async getAllUsers(req, res) {
-    try {
-        const dbUserData = await user.find({}).populate('thoughts').populate('friends');
-        res.json(dbUserData);
-    } catch (err) {
-        console.log(err);
-        res.status(500).json(err);
-    }
+getAllUsers(req, res) {
+    user.find()
+    .select('-__v')
+        .then(dbUserData => res.json(dbUserData))
+        .catch(err => {
+            console.log(err);
+            res.status(500).json(err);
+        });
 },
-
-async getUserById(req, res) {
-    try {
-        const dbUserData = await user.findOne({ _id: req.params.id }).populate('thoughts').populate('friends');
-        if (!dbUserData) {
-            return res.status(404).json({ message: 'No user found with this id!' });
-        }
-        res.json(dbUserData);
-    } catch (err) {
-        console.log(err);
-        res.status(500).json(err);
-    }
-},
-
+//get user by id
+getUserById(req, res) {
+    user.findOne({ _id: req.params.userId })
+    .select('-__v')
+    .populate("thoughts")
+        .then(dbUserData => {
+            if (!dbUserData) {
+                return res.status(404).json({ message: 'No user found with this id!' });
+            }
+            res.json(dbUserData);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json(err);
+        });
+}
+,
 
 //create new user
 
@@ -57,7 +60,7 @@ async updateUser(req, res) {
 
 async deleteUser(req, res) {
     try {
-        const dbUserData = await user.findOneAndDelete({ _id: req.params.id });
+        const dbUserData = await user.findOneAndDelete({_id: req.params.userId});
         if (!dbUserData) {
             return res.status(404).json({ message: 'No user found with this id!' });
         }
@@ -107,3 +110,5 @@ async removeFriend(req, res) {
     }
 }
 };
+
+module.exports = userController;
